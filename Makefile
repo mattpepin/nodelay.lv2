@@ -13,8 +13,8 @@ LIB_EXT=.so
 
 LV2DIR ?= $(PREFIX)/lib/lv2
 LOADLIBES=-lm
-LV2NAME=nodelay
-BUNDLE=nodelay.lv2
+LV2NAME=nodelaystereo
+BUNDLE=nodelaystereo.lv2
 BUILDDIR=build/
 targets=
 

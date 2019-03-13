@@ -11,11 +11,11 @@
 	foaf:mbox <mailto:robin@gareus.org> ;
 	foaf:homepage <http://gareus.org/> .
 
-<http://gareus.org/oss/lv2/nodelay>
+<http://gareus.org/oss/lv2/nodelaystereo>
 	a lv2:Plugin, doap:Project;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
 	doap:maintainer <http://gareus.org/rgareus#me> ;
-	doap:name "No Delay Line";
+	doap:name "No Delay Line (Stereo)";
 	@VERSION@
 	lv2:optionalFeature lv2:hardRTCapable ;
 	lv2:port [
@@ -63,14 +63,26 @@
 		a lv2:AudioPort ,
 			lv2:InputPort ;
 		lv2:index 3 ;
-		lv2:symbol "in" ;
-		lv2:name "In"
+		lv2:symbol "in_l" ;
+		lv2:name "In (Left)"
+	] , [
+		a lv2:AudioPort ,
+			lv2:InputPort ;
+		lv2:index 4 ;
+		lv2:symbol "in_r" ;
+		lv2:name "In (Right)"
 	] , [
 		a lv2:AudioPort ,
 			lv2:OutputPort ;
-		lv2:index 4 ;
-		lv2:symbol "out" ;
-		lv2:name "Out"
+		lv2:index 5 ;
+		lv2:symbol "out_l" ;
+		lv2:name "Out (Right)"
+	] , [
+		a lv2:AudioPort ,
+			lv2:OutputPort ;
+		lv2:index 6 ;
+		lv2:symbol "out_r" ;
+		lv2:name "Out (Right)"
 	] ;
 	rdfs:comment "Artificial Latency - nodelay is a simple audio delay-line that can report its delay as latency. The effect should be transparent when used with a LV2 host that implements latency compensation." ;
 	.

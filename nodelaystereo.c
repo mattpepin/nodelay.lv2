@@ -25,7 +25,7 @@
 
 #include "lv2/lv2plug.in/ns/lv2core/lv2.h"
 
-#define NDL_URI "http://gareus.org/oss/lv2/nodelay"
+#define NDL_URI "http://gareus.org/oss/lv2/nodelaystereo"
 
 #define MAXDELAY (192001)
 #define FADE_LEN (16)
@@ -34,18 +34,23 @@ typedef enum {
 	NDL_DELAY    = 0,
 	NDL_REPORT   = 1,
 	NDL_LATENCY  = 2,
-	NDL_INPUT    = 3,
-	NDL_OUTPUT   = 4
+	NDL_INPUT_L  = 3,
+	NDL_INPUT_R  = 4,
+	NDL_OUTPUT_L = 5,
+	NDL_OUTPUT_R = 6
 } PortIndex;
 
 typedef struct {
 	float* delay;
 	float* report_latency;
 	float* latency;
-	float* input;
-	float* output;
+	float* input_l;
+	float* input_r;
+	float* output_l;
+	float* output_r;
 
-	float buffer[MAXDELAY];
+	float buffer_l[MAXDELAY];
+	float buffer_r[MAXDELAY];
 	int c_dly;
 	int w_ptr;
 	int r_ptr;
@@ -79,11 +84,17 @@ connect_port(LV2_Handle instance,
 	case NDL_LATENCY:
 		self->latency = data;
 		break;
-	case NDL_INPUT:
-		self->input = data;
+	case NDL_INPUT_L:
+		self->input_l = data;
 		break;
-	case NDL_OUTPUT:
-		self->output = data;
+	case NDL_INPUT_R:
+		self->input_r = data;
+		break;
+	case NDL_OUTPUT_L:
+		self->output_l = data;
+		break;
+	case NDL_OUTPUT_R:
+		self->output_r = data;
 		break;
 	}
 }
@@ -109,8 +120,10 @@ run(LV2_Handle instance, uint32_t n_samples)
 	int mode = rint (*self->report_latency);
 
 	float delay = delay_ctrl;
-	const float* const input = self->input;
-	float* const output = self->output;
+	const float* const input_l = self->input_l;
+	const float* const input_r = self->input_r;
+	float* const output_l = self->output_l;
+	float* const output_r = self->output_r;
 
 	if (mode >= 2) {
 		delay = 0;
@@ -122,8 +135,10 @@ run(LV2_Handle instance, uint32_t n_samples)
 		// fade out
 		for (; pos < fade_len; pos++) {
 			const float gain = (float)(fade_len - pos) / (float)fade_len;
-			self->buffer[ self->w_ptr ] = input[pos];
-			output[pos] = self->buffer[ self->r_ptr ] * gain;
+			self->buffer_l[ self->w_ptr ] = input_l[pos];
+			self->buffer_r[ self->w_ptr ] = input_r[pos];
+			output_l[pos] = self->buffer_l[ self->r_ptr ] * gain;
+			output_r[pos] = self->buffer_r[ self->r_ptr ] * gain;
 			INCREMENT_PTRS;
 		}
 
@@ -138,8 +153,10 @@ run(LV2_Handle instance, uint32_t n_samples)
 		// fade in
 		for (; pos < 2 * fade_len; pos++) {
 			const float gain = (float)(pos - fade_len) / (float)fade_len;
-			self->buffer[ self->w_ptr ] = input[pos];
-			output[pos] = self->buffer[ self->r_ptr ] * gain;
+			self->buffer_l[ self->w_ptr ] = input_l[pos];
+			self->buffer_r[ self->w_ptr ] = input_r[pos];
+			output_l[pos] = self->buffer_l[ self->r_ptr ] * gain;
+			output_r[pos] = self->buffer_r[ self->r_ptr ] * gain;
 			INCREMENT_PTRS;
 		}
 	}
@@ -157,8 +174,10 @@ run(LV2_Handle instance, uint32_t n_samples)
 	}
 
 	for (; pos < n_samples; pos++) {
-		self->buffer[ self->w_ptr ] = input[pos];
-		output[pos] = self->buffer[ self->r_ptr ];
+		self->buffer_l[ self->w_ptr ] = input_l[pos];
+		self->buffer_r[ self->w_ptr ] = input_r[pos];
+		output_l[pos] = self->buffer_l[ self->r_ptr ];
+		output_r[pos] = self->buffer_r[ self->r_ptr ];
 		INCREMENT_PTRS;
 	}
 }
