@@ -23,7 +23,7 @@
 			lv2:ControlPort ;
 		lv2:index 0 ;
 		lv2:symbol "delay" ;
-		lv2:name "delay";
+		lv2:name "Delay";
 		lv2:default 0 ;
 		lv2:minimum 0 ;
 		lv2:maximum 192000 ;
